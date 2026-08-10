@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <meta name="description" content="A web-based system to manage student information easily and securely.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <div class="container glass-panel">
+        <header>
+            <div>
+                <h1><i class="fa-solid fa-graduation-cap"></i> Student Management</h1>
+                <p>Manage all your student records in one place.</p>
+            </div>
+            <button id="addStudentBtn" class="btn primary-btn"><i class="fa-solid fa-plus"></i> Add New Student</button>
+        </header>
+
+        <div class="dashboard-cards">
+            <div class="card">
+                <p>Students</p>
+                <h3 id="statTotal">0</h3>
+            </div>
+            <div class="card">
+                <p>Active</p>
+                <h3 id="statActive">0</h3>
+            </div>
+            <div class="card">
+                <p>Graduate</p>
+                <h3 id="statGraduated">0</h3>
+            </div>
+            <div class="card">
+                <p>Inactive</p>
+                <h3 id="statInactive">0</h3>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by name, ID or course...">
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="studentsTable">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Course</th>
+                        <th>Date of Joining</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="studentsTableBody">
+                    <!-- Dynamic content will be injected here by JS -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="emptyState" class="empty-state hidden">
+            <div class="empty-icon"><i class="fa-solid fa-user-graduate"></i></div>
+            <h3>No students found</h3>
+            <p>Get started by adding a new student to the system.</p>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit Student -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content glass-panel">
+            <span class="close-btn" id="closeModalBtn">&#10005;</span>
+            <h2 id="modalTitle">Add New Student</h2>
+            <form id="studentForm">
+                <input type="hidden" id="editIndex" value="-1">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="studentId">Student ID</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-id-card"></i>
+                            <input type="text" id="studentId" required placeholder="e.g. STU-001">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-user"></i>
+                            <input type="text" id="name" required placeholder="John Doe">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="email" required placeholder="john@example.com">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="course">Course/Program</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-book"></i>
+                            <select id="course" required>
+                                <option value="">Select a course</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Business Administration">Business Administration</option>
+                                <option value="Engineering">Engineering</option>
+                                <option value="Arts & Humanities">Arts & Humanities</option>
+                                <option value="Medicine">Medicine</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="date">Enrollment Date</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-calendar-day"></i>
+                            <input type="text" id="date" required placeholder="Select date...">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-info-circle"></i>
+                        <select id="status" required>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Graduated">Graduated</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" id="cancelBtn" class="btn secondary-btn">Cancel</button>
+                    <button type="submit" class="btn primary-btn" id="saveBtn">Save Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Action completed successfully</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="script.js"></script>
+</body>
+</html>
