@@ -14,6 +14,44 @@ const tableContainer = document.querySelector('.table-container');
 const modalTitle = document.getElementById('modalTitle');
 const editIndex = document.getElementById('editIndex');
 const toast = document.getElementById('toast');
+const statusFilter = document.getElementById('statusFilter');
+
+// Mobile Menu Elements
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+const sidebar = document.getElementById('sidebar');
+
+// Navigation Elements
+const loginScreen = document.getElementById('loginScreen');
+const appLayout = document.getElementById('appLayout');
+const loginForm = document.getElementById('loginForm');
+const logoutBtn = document.getElementById('logoutBtn');
+const navItems = document.querySelectorAll('.sidebar-nav .nav-item[data-section]');
+const pageSections = document.querySelectorAll('.page-section');
+const sharedTableContainer = document.getElementById('sharedTableContainer');
+
+// Helpers
+function escapeHTML(str) {
+    return str.replace(/[&<>'"]/g,
+        tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag])
+    );
+}
+
+function getInitials(name) {
+    const names = name.trim().split(' ');
+    if (names.length >= 2) {
+        return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+    } else if (names.length === 1 && names[0].length > 0) {
+        return (names[0][0]).toUpperCase();
+    }
+    return '';
+}
 
 // Initialize app
 function init() {
@@ -31,7 +69,7 @@ function init() {
     if (storedData) {
         students = JSON.parse(storedData);
     }
-    
+
     renderTable();
     setupEventListeners();
 }
@@ -41,7 +79,20 @@ function setupEventListeners() {
     addStudentBtn.addEventListener('click', () => openModal());
     closeModalBtn.addEventListener('click', closeModal);
     cancelBtn.addEventListener('click', closeModal);
-    
+
+    // Mobile menu toggles
+    if (mobileMenuBtn && sidebar) {
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.add('show');
+        });
+    }
+
+    if (closeSidebarBtn && sidebar) {
+        closeSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.remove('show');
+        });
+    }
+
     // Close modal when clicking outside
     window.addEventListener('click', (e) => {
         if (e.target === studentModal) {
@@ -51,6 +102,65 @@ function setupEventListeners() {
 
     studentForm.addEventListener('submit', handleFormSubmit);
     searchInput.addEventListener('input', handleSearch);
+    if (statusFilter) {
+        statusFilter.addEventListener('change', handleSearch);
+    }
+
+    // Login/Logout Handlers
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            loginScreen.classList.add('hidden-app');
+            appLayout.classList.remove('hidden-app');
+            showToast('Logged in successfully!');
+        });
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            appLayout.classList.add('hidden-app');
+            loginScreen.classList.remove('hidden-app');
+            showToast('Logged out successfully!');
+        });
+    }
+
+    // Navigation Handlers
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // Remove active class from all nav items
+            navItems.forEach(nav => nav.classList.remove('active'));
+
+            // Add active class to clicked item
+            item.classList.add('active');
+
+            // Get target section
+            const targetId = item.getAttribute('data-section');
+
+            // Hide all sections
+            pageSections.forEach(section => section.classList.remove('active'));
+
+            // Show target section
+            const targetSection = document.getElementById(targetId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+
+            // Show shared table container if dashboard or students is active
+            if (targetId === 'dashboardSection' || targetId === 'studentsSection') {
+                if (sharedTableContainer) {
+                    sharedTableContainer.classList.add('active');
+                }
+            }
+
+            // On mobile, close sidebar after navigation
+            if (window.innerWidth <= 768 && sidebar) {
+                sidebar.classList.remove('show');
+            }
+        });
+    });
 }
 
 // Update Dashboard Stats
@@ -59,47 +169,64 @@ function updateStats() {
     const active = students.filter(s => s.status === 'Active').length;
     const graduated = students.filter(s => s.status === 'Graduated').length;
     const inactive = students.filter(s => s.status === 'Inactive').length;
-    
+
     const elTotal = document.getElementById('statTotal');
     const elActive = document.getElementById('statActive');
     const elGraduated = document.getElementById('statGraduated');
     const elInactive = document.getElementById('statInactive');
-    
-    if(elTotal) elTotal.textContent = total;
-    if(elActive) elActive.textContent = active;
-    if(elGraduated) elGraduated.textContent = graduated;
-    if(elInactive) elInactive.textContent = inactive;
+
+    if (elTotal) elTotal.textContent = total;
+    if (elActive) elActive.textContent = active;
+    if (elGraduated) elGraduated.textContent = graduated;
+    if (elInactive) elInactive.textContent = inactive;
 }
 
 // Render the students table
 function renderTable(data = students) {
     updateStats();
+
+    const recordCountEl = document.getElementById('recordCount');
+    if (recordCountEl) recordCountEl.textContent = data.length;
+
     studentsTableBody.innerHTML = '';
-    
+
     if (data.length === 0) {
         tableContainer.style.display = 'none';
         emptyState.classList.remove('hidden');
     } else {
         tableContainer.style.display = 'block';
         emptyState.classList.add('hidden');
-        
+
         data.forEach((student, index) => {
             // Find the actual index in the main array for editing/deleting if we are filtering
             const actualIndex = students.findIndex(s => s.studentId === student.studentId);
-            
+
             const tr = document.createElement('tr');
-            
+
             // Format date
             const dateObj = new Date(student.date);
-            const formattedDate = dateObj.toLocaleDateString('en-US', { 
-                year: 'numeric', month: 'short', day: 'numeric' 
+            const formattedDate = dateObj.toLocaleDateString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric'
             });
-            
+
+            // Escape HTML for text fields
+            const safeId = escapeHTML(student.studentId || '');
+            const safeName = escapeHTML(student.name || '');
+            const safeEmail = escapeHTML(student.email || '');
+            const safeCourse = escapeHTML(student.course || '');
+
+            const initials = getInitials(safeName);
+
             tr.innerHTML = `
-                <td><strong>${student.studentId}</strong></td>
-                <td>${student.name}</td>
-                <td>${student.email}</td>
-                <td>${student.course}</td>
+                <td><strong>${safeId}</strong></td>
+                <td>
+                    <div class="student-profile">
+                        <div class="avatar">${initials}</div>
+                        <span>${safeName}</span>
+                    </div>
+                </td>
+                <td>${safeEmail}</td>
+                <td>${safeCourse}</td>
                 <td>${formattedDate}</td>
                 <td><span class="status-badge status-${student.status.toLowerCase()}">${student.status}</span></td>
                 <td>
@@ -119,9 +246,9 @@ function renderTable(data = students) {
 // Handle Form Submission
 function handleFormSubmit(e) {
     e.preventDefault();
-    
+
     const index = parseInt(editIndex.value);
-    
+
     const studentData = {
         studentId: document.getElementById('studentId').value,
         name: document.getElementById('name').value,
@@ -135,7 +262,7 @@ function handleFormSubmit(e) {
     const selectedDate = new Date(studentData.date);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     if (selectedDate > today) {
         showToast('Date of Joining cannot be in the future!', 'error');
         return;
@@ -143,8 +270,8 @@ function handleFormSubmit(e) {
 
     if (index === -1) {
         // Add new student
-        // Check if ID already exists
-        if (students.some(s => s.studentId === studentData.studentId)) {
+        // Check if ID already exists (case-insensitive)
+        if (students.some(s => s.studentId.toLowerCase() === studentData.studentId.toLowerCase())) {
             showToast('Student ID already exists!', 'error');
             return;
         }
@@ -152,46 +279,52 @@ function handleFormSubmit(e) {
         showToast('Student added successfully!');
     } else {
         // Update existing student
-        // Check if ID exists and is not the current student
-        if (students.some((s, i) => s.studentId === studentData.studentId && i !== index)) {
+        // Check if ID exists and is not the current student (case-insensitive)
+        if (students.some((s, i) => s.studentId.toLowerCase() === studentData.studentId.toLowerCase() && i !== index)) {
             showToast('Student ID already exists!', 'error');
             return;
         }
         students[index] = studentData;
         showToast('Student updated successfully!');
     }
-    
+
     saveData();
     renderTable();
     closeModal();
 }
 
 // Edit Student
-window.editStudent = function(index) {
+window.editStudent = function (index) {
     const student = students[index];
-    
+
     document.getElementById('studentId').value = student.studentId;
     document.getElementById('name').value = student.name;
     document.getElementById('email').value = student.email;
     document.getElementById('course').value = student.course;
-    document.getElementById('date').value = student.date;
+
+    const dateInput = document.getElementById('date');
+    dateInput.value = student.date;
+    if (dateInput._flatpickr) {
+        dateInput._flatpickr.setDate(student.date);
+    }
+
     document.getElementById('status').value = student.status;
-    
+
     editIndex.value = index;
     modalTitle.textContent = 'Edit Student Details';
-    
+
     openModal();
 }
 
 // Delete Student
-window.deleteStudent = function(index) {
+window.deleteStudent = function (index) {
     if (confirm(`Are you sure you want to delete ${students[index].name}'s record?`)) {
         students.splice(index, 1);
         saveData();
-        
+
         // Re-apply search if exists
         handleSearch();
-        
+
         showToast('Student deleted successfully!');
     }
 }
@@ -199,20 +332,25 @@ window.deleteStudent = function(index) {
 // Search functionality
 function handleSearch() {
     const searchTerm = searchInput.value.toLowerCase();
-    
-    if (searchTerm === '') {
-        renderTable(students);
-        return;
+    const currentStatus = statusFilter ? statusFilter.value : '';
+
+    let filteredStudents = students;
+
+    if (searchTerm !== '') {
+        filteredStudents = filteredStudents.filter(student => {
+            return (
+                student.name.toLowerCase().includes(searchTerm) ||
+                student.studentId.toLowerCase().includes(searchTerm) ||
+                student.email.toLowerCase().includes(searchTerm) ||
+                student.course.toLowerCase().includes(searchTerm)
+            );
+        });
     }
-    
-    const filteredStudents = students.filter(student => {
-        return (
-            student.name.toLowerCase().includes(searchTerm) ||
-            student.studentId.toLowerCase().includes(searchTerm) ||
-            student.course.toLowerCase().includes(searchTerm)
-        );
-    });
-    
+
+    if (currentStatus !== '') {
+        filteredStudents = filteredStudents.filter(student => student.status === currentStatus);
+    }
+
     renderTable(filteredStudents);
 }
 
@@ -241,9 +379,9 @@ function showToast(message, type = 'success') {
     } else {
         toast.style.backgroundColor = '#10b981';
     }
-    
+
     toast.classList.add('show');
-    
+
     setTimeout(() => {
         toast.classList.remove('show');
     }, 3000);

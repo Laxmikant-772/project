@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,84 +13,293 @@
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Main Stylesheet -->
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-    <div class="background-shapes">
-        <div class="shape shape-1"></div>
-        <div class="shape shape-2"></div>
-        <div class="shape shape-3"></div>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-card">
+            <div class="brand-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+            <h2>EduManage</h2>
+            <p>Sign in to your account</p>
+            <form id="loginForm">
+                <div class="form-group" style="text-align: left;">
+                    <label>Username</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="loginUsername" placeholder="admin" value="admin" required>
+                    </div>
+                </div>
+                <div class="form-group" style="text-align: left;">
+                    <label>Password</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="password" value="password" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn primary-btn" style="width: 100%; margin-top: 1rem;">Login</button>
+            </form>
+        </div>
     </div>
 
-    <div class="container glass-panel">
-        <header>
-            <div>
-                <h1><i class="fa-solid fa-graduation-cap"></i> Student Management</h1>
-                <p>Manage all your student records in one place.</p>
+    <div class="app-layout hidden-app" id="appLayout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <div class="brand-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <div class="brand-text">
+                        <h2>EduManage</h2>
+                        <p>Student Portal</p>
+                    </div>
+                </div>
+                <button class="close-sidebar-btn" id="closeSidebarBtn"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <button id="addStudentBtn" class="btn primary-btn"><i class="fa-solid fa-plus"></i> Add New Student</button>
-        </header>
 
-        <div class="dashboard-cards">
-            <div class="card">
-                <p>Students</p>
-                <h3 id="statTotal">0</h3>
-            </div>
-            <div class="card">
-                <p>Active</p>
-                <h3 id="statActive">0</h3>
-            </div>
-            <div class="card">
-                <p>Graduate</p>
-                <h3 id="statGraduated">0</h3>
-            </div>
-            <div class="card">
-                <p>Inactive</p>
-                <h3 id="statInactive">0</h3>
-            </div>
-        </div>
+            <nav class="sidebar-nav">
+                <p class="nav-title">MAIN MENU</p>
+                <a href="#" class="nav-item active" data-section="dashboardSection"><i
+                        class="fa-solid fa-chart-pie"></i> <span>Dashboard</span></a>
+                <a href="#" class="nav-item" data-section="studentsSection"><i class="fa-solid fa-users"></i>
+                    <span>Students</span></a>
+                <a href="#" class="nav-item" data-section="coursesSection"><i class="fa-solid fa-book"></i>
+                    <span>Courses</span></a>
 
-        <div class="controls">
-            <div class="search-box">
-                <i class="fa-solid fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search by name, ID or course...">
-            </div>
-        </div>
+                <p class="nav-title mt-2">MANAGEMENT</p>
+                <a href="#" class="nav-item" data-section="enrollmentSection"><i class="fa-solid fa-address-card"></i>
+                    <span>Enrollment</span></a>
+                <a href="#" class="nav-item" data-section="recordsSection"><i class="fa-solid fa-folder-open"></i>
+                    <span>Records</span></a>
+            </nav>
 
-        <div class="table-container">
-            <table id="studentsTable">
-                <thead>
-                    <tr>
-                        <th>Student ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Course</th>
-                        <th>Date of Joining</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="studentsTableBody">
-                    <!-- Dynamic content will be injected here by JS -->
-                </tbody>
-            </table>
-        </div>
-        
-        <div id="emptyState" class="empty-state hidden">
-            <div class="empty-icon"><i class="fa-solid fa-user-graduate"></i></div>
-            <h3>No students found</h3>
-            <p>Get started by adding a new student to the system.</p>
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item" data-section="settingsSection"><i class="fa-solid fa-gear"></i>
+                    <span>Settings</span></a>
+                <a href="#" class="nav-item text-danger" id="logoutBtn"><i
+                        class="fa-solid fa-arrow-right-from-bracket"></i> <span>Logout</span></a>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <div class="main-wrapper">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fa-solid fa-bars"></i></button>
+                    <div class="global-search">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" placeholder="Search across portal...">
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <button class="icon-btn notification-btn">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="badge">3</span>
+                    </button>
+
+                    <div class="user-profile">
+                        <div class="user-info">
+                            <h4>Administrator</h4>
+                            <p>Student Manager</p>
+                        </div>
+                        <div class="avatar-small">AM</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <div class="container">
+                    <!-- Dashboard Header & Stats Section -->
+                    <div id="dashboardSection" class="page-section active">
+                        <div class="page-header">
+                            <div class="header-title">
+                                <span class="breadcrumb">Dashboard / Overview</span>
+                                <h1>Student Dashboard</h1>
+                                <p>Welcome back. Here's an overview of your student records.</p>
+                            </div>
+                            <button class="btn primary-btn"
+                                onclick="document.getElementById('addStudentBtn').click()"><i
+                                    class="fa-solid fa-plus"></i> Add Student</button>
+                        </div>
+                        <div class="dashboard-stats" style="margin-top: 2rem; margin-bottom: 2rem;">
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                                <div class="stat-info">
+                                    <p>TOTAL STUDENTS</p>
+                                    <h3 id="statTotal">0</h3>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon icon-active"><i class="fa-solid fa-user-check"></i></div>
+                                <div class="stat-info">
+                                    <p>ACTIVE STUDENTS</p>
+                                    <h3 id="statActive">0</h3>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon icon-graduated"><i class="fa-solid fa-user-graduate"></i></div>
+                                <div class="stat-info">
+                                    <p>GRADUATED</p>
+                                    <h3 id="statGraduated">0</h3>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon icon-inactive"><i class="fa-solid fa-user-clock"></i></div>
+                                <div class="stat-info">
+                                    <p>INACTIVE</p>
+                                    <h3 id="statInactive">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Students Header Section -->
+                    <div id="studentsSection" class="page-section">
+                        <div class="page-header" style="margin-bottom: 2rem;">
+                            <div class="header-title">
+                                <h1>Students</h1>
+                                <p>Manage and view student records.</p>
+                            </div>
+                            <button id="addStudentBtn" class="btn primary-btn"><i class="fa-solid fa-plus"></i> Add
+                                Student</button>
+                        </div>
+                    </div>
+
+                    <!-- Shared Table Section (Shown in both Dashboard and Students views) -->
+                    <div id="sharedTableContainer" class="page-section active">
+                        <div class="records-card">
+                            <div class="records-header">
+                                <div>
+                                    <h2 id="tableTitle">Recent Students</h2>
+                                    <p id="tableSubtitle">View and manage all registered students.</p>
+                                </div>
+                                <div class="record-counter">
+                                    <span id="recordCount">0</span> records
+                                </div>
+                            </div>
+
+                            <div class="controls">
+                                <div class="search-box">
+                                    <i class="fa-solid fa-search"></i>
+                                    <input type="text" id="searchInput"
+                                        placeholder="Search by name, ID, email or course...">
+                                </div>
+                                <div class="filter-box">
+                                    <select id="statusFilter">
+                                        <option value="">All Status</option>
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                        <option value="Graduated">Graduated</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="table-container">
+                                <table id="studentsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Student ID</th>
+                                            <th>Student</th>
+                                            <th>Email</th>
+                                            <th>Course</th>
+                                            <th>Joined</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="studentsTableBody">
+                                        <!-- Dynamic content will be injected here by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div id="emptyState" class="empty-state hidden">
+                                <div class="empty-icon"><i class="fa-solid fa-user-graduate"></i></div>
+                                <h3>No students found</h3>
+                                <p>There are no records matching your current search or filter.</p>
+                                <button class="btn primary-btn" style="margin-top: 1rem;"
+                                    onclick="document.getElementById('addStudentBtn').click()"><i
+                                        class="fa-solid fa-plus"></i> Add
+                                    Student</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Other Empty Sections -->
+                    <div id="coursesSection" class="page-section">
+                        <div class="page-header" style="margin-bottom: 2rem;">
+                            <div class="header-title">
+                                <h1>Courses</h1>
+                                <p>Manage academic courses and programs.</p>
+                            </div>
+                        </div>
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fa-solid fa-book"></i></div>
+                            <h3>Courses Module</h3>
+                            <p>This module is currently under development.</p>
+                        </div>
+                    </div>
+
+                    <div id="enrollmentSection" class="page-section">
+                        <div class="page-header" style="margin-bottom: 2rem;">
+                            <div class="header-title">
+                                <h1>Enrollment</h1>
+                                <p>Process new student enrollments.</p>
+                            </div>
+                        </div>
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fa-solid fa-address-card"></i></div>
+                            <h3>Enrollment Module</h3>
+                            <p>This module is currently under development.</p>
+                        </div>
+                    </div>
+
+                    <div id="recordsSection" class="page-section">
+                        <div class="page-header" style="margin-bottom: 2rem;">
+                            <div class="header-title">
+                                <h1>Records</h1>
+                                <p>Access complete academic records.</p>
+                            </div>
+                        </div>
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fa-solid fa-folder-open"></i></div>
+                            <h3>Records Module</h3>
+                            <p>This module is currently under development.</p>
+                        </div>
+                    </div>
+
+                    <div id="settingsSection" class="page-section">
+                        <div class="page-header" style="margin-bottom: 2rem;">
+                            <div class="header-title">
+                                <h1>Settings</h1>
+                                <p>System configuration and preferences.</p>
+                            </div>
+                        </div>
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fa-solid fa-gear"></i></div>
+                            <h3>Settings Module</h3>
+                            <p>This module is currently under development.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
         </div>
     </div>
 
     <!-- Modal for Add/Edit Student -->
     <div id="studentModal" class="modal">
-        <div class="modal-content glass-panel">
-            <span class="close-btn" id="closeModalBtn">&#10005;</span>
+        <div class="modal-content">
+            <span class="close-btn" id="closeModalBtn"><i class="fa-solid fa-xmark"></i></span>
             <h2 id="modalTitle">Add New Student</h2>
+            <p class="modal-subtitle">Enter the student's information below.</p>
             <form id="studentForm">
                 <input type="hidden" id="editIndex" value="-1">
-                
+
                 <div class="form-row">
                     <div class="form-group">
                         <label for="studentId">Student ID</label>
@@ -98,7 +308,7 @@
                             <input type="text" id="studentId" required placeholder="e.g. STU-001">
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="name">Full Name</label>
                         <div class="input-wrapper">
@@ -107,7 +317,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="email">Email Address</label>
                     <div class="input-wrapper">
@@ -115,7 +325,7 @@
                         <input type="email" id="email" required placeholder="john@example.com">
                     </div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group">
                         <label for="course">Course/Program</label>
@@ -131,7 +341,7 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="date">Enrollment Date</label>
                         <div class="input-wrapper">
@@ -140,7 +350,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="status">Status</label>
                     <div class="input-wrapper">
@@ -152,7 +362,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="form-actions">
                     <button type="button" id="cancelBtn" class="btn secondary-btn">Cancel</button>
                     <button type="submit" class="btn primary-btn" id="saveBtn">Save Student</button>
@@ -167,4 +377,5 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="script.js"></script>
 </body>
+
 </html>
