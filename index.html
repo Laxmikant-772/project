@@ -20,27 +20,35 @@
 <body>
     <!-- Login Screen -->
     <div id="loginScreen" class="login-screen">
-        <div class="login-card">
-            <div class="brand-icon"><i class="fa-solid fa-graduation-cap"></i></div>
-            <h2>EduManage</h2>
-            <p>Sign in to your account</p>
-            <form id="loginForm">
-                <div class="form-group" style="text-align: left;">
-                    <label>Username</label>
-                    <div class="input-wrapper">
-                        <i class="fa-solid fa-user"></i>
-                        <input type="text" id="loginUsername" placeholder="admin" value="admin" required>
-                    </div>
+        <div class="login-container">
+            <div class="login-banner">
+                <div class="banner-content">
+                    <h1>Welcome to EduManage</h1>
+                    <p>The complete student management system for modern educational institutions.</p>
                 </div>
-                <div class="form-group" style="text-align: left;">
-                    <label>Password</label>
-                    <div class="input-wrapper">
-                        <i class="fa-solid fa-lock"></i>
-                        <input type="password" id="loginPassword" placeholder="password" value="password" required>
+            </div>
+            <div class="login-card">
+                <div class="brand-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                <h2>EduManage</h2>
+                <p>Sign in to your account</p>
+                <form id="loginForm">
+                    <div class="form-group" style="text-align: left;">
+                        <label>Username</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-user"></i>
+                            <input type="text" id="loginUsername" placeholder="Enter username" required>
+                        </div>
                     </div>
-                </div>
-                <button type="submit" class="btn primary-btn" style="width: 100%; margin-top: 1rem;">Login</button>
-            </form>
+                    <div class="form-group" style="text-align: left;">
+                        <label>Password</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" id="loginPassword" placeholder="Enter password" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn primary-btn" style="width: 100%; margin-top: 1rem;">Login</button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -74,12 +82,7 @@
                     <span>Records</span></a>
             </nav>
 
-            <div class="sidebar-footer">
-                <a href="#" class="nav-item" data-section="settingsSection"><i class="fa-solid fa-gear"></i>
-                    <span>Settings</span></a>
-                <a href="#" class="nav-item text-danger" id="logoutBtn"><i
-                        class="fa-solid fa-arrow-right-from-bracket"></i> <span>Logout</span></a>
-            </div>
+
         </aside>
 
         <!-- Main Content Wrapper -->
@@ -95,17 +98,37 @@
                 </div>
 
                 <div class="header-right">
-                    <button class="icon-btn notification-btn">
-                        <i class="fa-regular fa-bell"></i>
-                        <span class="badge">3</span>
-                    </button>
-
-                    <div class="user-profile">
-                        <div class="user-info">
-                            <h4>Administrator</h4>
-                            <p>Student Manager</p>
+                    <div class="dropdown-wrapper">
+                        <button class="icon-btn notification-btn" id="notificationBtn">
+                            <i class="fa-regular fa-bell"></i>
+                            <span class="badge">3</span>
+                        </button>
+                        <div class="dropdown-menu" id="notificationMenu">
+                            <div class="dropdown-header">Notifications (3)</div>
+                            <div class="dropdown-item">New student enrolled</div>
+                            <div class="dropdown-item">System update available</div>
+                            <div class="dropdown-item">Monthly report generated</div>
                         </div>
-                        <div class="avatar-small">AM</div>
+                    </div>
+
+                    <div class="dropdown-wrapper">
+                        <div class="user-profile" id="userProfileBtn">
+                            <div class="user-info">
+                                <h4>Administrator</h4>
+                                <p>admin@edumanage.com</p>
+                            </div>
+                            <div class="avatar-small">AD</div>
+                        </div>
+                        <div class="dropdown-menu" id="profileMenu">
+                            <div class="dropdown-header">
+                                <div style="font-weight: 600; color: var(--text-main);">Administrator</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 400; margin-top: 0.15rem;">admin@edumanage.com</div>
+                            </div>
+                            <div class="dropdown-item" id="dropdownProfileBtn"><i class="fa-solid fa-user"></i> Profile</div>
+                            <div class="dropdown-item" id="dropdownSettingsBtn"><i class="fa-solid fa-gear"></i> Settings</div>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-item text-danger" id="dropdownLogoutBtn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</div>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -283,6 +306,44 @@
                             <div class="empty-icon"><i class="fa-solid fa-gear"></i></div>
                             <h3>Settings Module</h3>
                             <p>This module is currently under development.</p>
+                        </div>
+                    </div>
+
+                    <div id="profileSection" class="page-section">
+                        <div class="page-header" style="margin-bottom: 2rem;">
+                            <div class="header-title">
+                                <h1>My Profile</h1>
+                                <p>Manage your account settings and preferences.</p>
+                            </div>
+                        </div>
+                        <div class="records-card" style="padding: 2rem;">
+                            <div style="display: flex; gap: 2.5rem; flex-wrap: wrap;">
+                                <div style="text-align: center; flex: 0 0 150px;">
+                                    <div class="avatar-small" style="width: 120px; height: 120px; font-size: 2.5rem; margin: 0 auto 1.5rem auto;">AD</div>
+                                    <button class="btn secondary-btn" style="width: 100%;">Change Avatar</button>
+                                </div>
+                                <div style="flex: 1; min-width: 300px;">
+                                    <form style="display: flex; flex-direction: column; gap: 1.5rem;">
+                                        <div class="form-row">
+                                            <div class="form-group" style="flex: 1;">
+                                                <label>Full Name</label>
+                                                <input type="text" value="Administrator" style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; color: var(--text-main);">
+                                            </div>
+                                            <div class="form-group" style="flex: 1;">
+                                                <label>Email Address</label>
+                                                <input type="email" value="admin@edumanage.com" style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; color: var(--text-main);">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Role</label>
+                                            <input type="text" value="Student Manager" disabled style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; background: var(--bg-color); color: var(--text-muted); cursor: not-allowed;">
+                                        </div>
+                                        <div>
+                                            <button type="button" class="btn primary-btn" onclick="showToast('Profile updated successfully!')">Save Changes</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

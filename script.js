@@ -161,6 +161,54 @@ function setupEventListeners() {
             }
         });
     });
+
+    // Dropdown Handlers
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationMenu = document.getElementById('notificationMenu');
+    const userProfileBtn = document.getElementById('userProfileBtn');
+    const profileMenu = document.getElementById('profileMenu');
+    const dropdownLogoutBtn = document.getElementById('dropdownLogoutBtn');
+
+    function toggleDropdown(menu) {
+        if (menu.classList.contains('show')) {
+            menu.classList.remove('show');
+        } else {
+            // Close others
+            if (notificationMenu) notificationMenu.classList.remove('show');
+            if (profileMenu) profileMenu.classList.remove('show');
+            menu.classList.add('show');
+        }
+    }
+
+    if (notificationBtn && notificationMenu) {
+        notificationBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown(notificationMenu);
+        });
+    }
+
+    if (userProfileBtn && profileMenu) {
+        userProfileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown(profileMenu);
+        });
+    }
+
+    // Close dropdowns on outside click
+    window.addEventListener('click', () => {
+        if (notificationMenu) notificationMenu.classList.remove('show');
+        if (profileMenu) profileMenu.classList.remove('show');
+    });
+
+    if (dropdownLogoutBtn) {
+        dropdownLogoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            appLayout.classList.add('hidden-app');
+            loginScreen.classList.remove('hidden-app');
+            showToast('Logged out successfully!');
+            if (profileMenu) profileMenu.classList.remove('show');
+        });
+    }
 }
 
 // Update Dashboard Stats
