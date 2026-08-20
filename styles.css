@@ -825,7 +825,7 @@ tbody tr:last-child td {
 }
 
 .secondary-btn {
-    background: white;
+    background: var(--card-bg);
     color: var(--text-main);
     border: 1px solid var(--border-color);
 }
@@ -1197,4 +1197,51 @@ label {
     .global-search {
         display: none;
     }
+}
+
+/* Dark Mode Overrides */
+body.dark-mode {
+    --bg-color: #0f172a;
+    --card-bg: #1e293b;
+    --border-color: #334155;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    
+    --primary: #818cf8;
+    --primary-hover: #6366f1;
+    --primary-light: rgba(99, 102, 241, 0.2);
+
+    --sidebar-bg: #090e17;
+    
+    --danger-bg: rgba(239, 68, 68, 0.2);
+    --success-bg: rgba(16, 185, 129, 0.2);
+    --warning-bg: rgba(245, 158, 11, 0.2);
+    --info-bg: rgba(59, 130, 246, 0.2);
+}
+
+body.dark-mode .controls,
+body.dark-mode tbody tr:hover {
+    background-color: #0b1120;
+}
+
+body.dark-mode .search-box input,
+body.dark-mode .filter-box select,
+body.dark-mode th,
+body.dark-mode .dropdown-menu {
+    background-color: var(--card-bg);
+    color: var(--text-main);
+}
+
+body.dark-mode input[type="text"],
+body.dark-mode input[type="password"],
+body.dark-mode input[type="email"],
+body.dark-mode select {
+    background-color: #0b1120 !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+}
+
+body.dark-mode .login-container,
+body.dark-mode .modal-content {
+    background-color: var(--card-bg);
 }

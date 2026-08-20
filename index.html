@@ -43,7 +43,7 @@
                         <label>Password</label>
                         <div class="input-wrapper">
                             <i class="fa-solid fa-lock"></i>
-                            <input type="password" id="loginPassword" placeholder="Enter password" required>
+                            <input type="password" id="loginPassword" placeholder="Enter password" required pattern="(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}" title="Password must be at least 8 characters long, contain a lowercase letter, a number, and a special character (e.g., @)">
                         </div>
                     </div>
                     <button type="submit" class="btn primary-btn" style="width: 100%; margin-top: 1rem;">Login</button>
@@ -98,6 +98,9 @@
                 </div>
 
                 <div class="header-right">
+                    <button class="icon-btn" id="darkModeBtn" title="Toggle Dark Mode">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
                     <div class="dropdown-wrapper">
                         <button class="icon-btn notification-btn" id="notificationBtn">
                             <i class="fa-regular fa-bell"></i>
@@ -302,10 +305,16 @@
                                 <p>System configuration and preferences.</p>
                             </div>
                         </div>
-                        <div class="empty-state">
-                            <div class="empty-icon"><i class="fa-solid fa-gear"></i></div>
-                            <h3>Settings Module</h3>
-                            <p>This module is currently under development.</p>
+                        <div class="records-card" style="padding: 2rem;">
+                            <form style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 500px;">
+                                <div class="form-group">
+                                    <label>System Password</label>
+                                    <input type="password" placeholder="Enter password" required pattern="(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}" title="Password must be at least 8 characters long, contain a lowercase letter, a number, and a special character (e.g., @)" style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; color: var(--text-main);">
+                                </div>
+                                <div>
+                                    <button type="button" class="btn primary-btn" onclick="showToast('Settings saved successfully!')">Save Settings</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
 
@@ -337,6 +346,10 @@
                                         <div class="form-group">
                                             <label>Role</label>
                                             <input type="text" value="Student Manager" disabled style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; background: var(--bg-color); color: var(--text-muted); cursor: not-allowed;">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Change Password</label>
+                                            <input type="password" placeholder="Enter password" pattern="(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}" title="Password must be at least 8 characters long, contain a lowercase letter, a number, and a special character (e.g., @)" style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; color: var(--text-main);">
                                         </div>
                                         <div>
                                             <button type="button" class="btn primary-btn" onclick="showToast('Profile updated successfully!')">Save Changes</button>

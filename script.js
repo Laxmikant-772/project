@@ -55,6 +55,16 @@ function getInitials(name) {
 
 // Initialize app
 function init() {
+    // Check dark mode preference
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        const darkModeIcon = document.querySelector('#darkModeBtn i');
+        if (darkModeIcon) {
+            darkModeIcon.classList.remove('fa-moon');
+            darkModeIcon.classList.add('fa-sun');
+        }
+    }
+
     // Initialize flatpickr on date input, restrict to past/today dates
     flatpickr("#date", {
         maxDate: "today",
@@ -168,6 +178,8 @@ function setupEventListeners() {
     const userProfileBtn = document.getElementById('userProfileBtn');
     const profileMenu = document.getElementById('profileMenu');
     const dropdownLogoutBtn = document.getElementById('dropdownLogoutBtn');
+    const dropdownProfileBtn = document.getElementById('dropdownProfileBtn');
+    const dropdownSettingsBtn = document.getElementById('dropdownSettingsBtn');
 
     function toggleDropdown(menu) {
         if (menu.classList.contains('show')) {
@@ -200,6 +212,28 @@ function setupEventListeners() {
         if (profileMenu) profileMenu.classList.remove('show');
     });
 
+    if (dropdownProfileBtn) {
+        dropdownProfileBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            navItems.forEach(nav => nav.classList.remove('active'));
+            pageSections.forEach(section => section.classList.remove('active'));
+            const target = document.getElementById('profileSection');
+            if (target) target.classList.add('active');
+            if (profileMenu) profileMenu.classList.remove('show');
+        });
+    }
+
+    if (dropdownSettingsBtn) {
+        dropdownSettingsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            navItems.forEach(nav => nav.classList.remove('active'));
+            pageSections.forEach(section => section.classList.remove('active'));
+            const target = document.getElementById('settingsSection');
+            if (target) target.classList.add('active');
+            if (profileMenu) profileMenu.classList.remove('show');
+        });
+    }
+
     if (dropdownLogoutBtn) {
         dropdownLogoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -207,6 +241,25 @@ function setupEventListeners() {
             loginScreen.classList.remove('hidden-app');
             showToast('Logged out successfully!');
             if (profileMenu) profileMenu.classList.remove('show');
+        });
+    }
+    
+    // Dark Mode Toggle
+    const darkModeBtn = document.getElementById('darkModeBtn');
+    if (darkModeBtn) {
+        darkModeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            
+            const icon = darkModeBtn.querySelector('i');
+            if (isDark) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
         });
     }
 }
