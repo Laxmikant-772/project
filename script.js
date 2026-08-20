@@ -65,6 +65,17 @@ function init() {
         }
     }
 
+    // Load profile data
+    const savedName = localStorage.getItem('profileName');
+    const savedEmail = localStorage.getItem('profileEmail');
+    if (savedName && savedEmail) {
+        updateProfileUI(savedName, savedEmail);
+        const nameInput = document.getElementById('profileNameInput');
+        const emailInput = document.getElementById('profileEmailInput');
+        if (nameInput) nameInput.value = savedName;
+        if (emailInput) emailInput.value = savedEmail;
+    }
+
     // Initialize flatpickr on date input, restrict to past/today dates
     flatpickr("#date", {
         maxDate: "today",
@@ -112,6 +123,11 @@ function setupEventListeners() {
 
     studentForm.addEventListener('submit', handleFormSubmit);
     searchInput.addEventListener('input', handleSearch);
+    
+    const profileForm = document.getElementById('profileUpdateForm');
+    if (profileForm) {
+        profileForm.addEventListener('submit', handleProfileSubmit);
+    }
     if (statusFilter) {
         statusFilter.addEventListener('change', handleSearch);
     }
@@ -486,6 +502,48 @@ function showToast(message, type = 'success') {
     setTimeout(() => {
         toast.classList.remove('show');
     }, 3000);
+}
+
+// Profile Updates
+function updateProfileUI(name, email) {
+    const initials = getInitials(name);
+    
+    const hn = document.getElementById('headerProfileName');
+    const he = document.getElementById('headerProfileEmail');
+    const ha = document.getElementById('headerProfileAvatar');
+    const mn = document.getElementById('menuProfileName');
+    const me = document.getElementById('menuProfileEmail');
+    const pa = document.getElementById('profilePageAvatar');
+    
+    if (hn) hn.textContent = name;
+    if (he) he.textContent = email;
+    if (ha) ha.textContent = initials;
+    if (mn) mn.textContent = name;
+    if (me) me.textContent = email;
+    if (pa) pa.textContent = initials;
+}
+
+function handleProfileSubmit(e) {
+    e.preventDefault();
+    const nameInput = document.getElementById('profileNameInput');
+    const emailInput = document.getElementById('profileEmailInput');
+    const passInput = document.getElementById('profilePasswordInput');
+    
+    if (nameInput && emailInput) {
+        const newName = nameInput.value;
+        const newEmail = emailInput.value;
+        
+        localStorage.setItem('profileName', newName);
+        localStorage.setItem('profileEmail', newEmail);
+        
+        if (passInput && passInput.value) {
+            localStorage.setItem('profilePassword', passInput.value);
+            passInput.value = ''; // clear after save
+        }
+        
+        updateProfileUI(newName, newEmail);
+        showToast('Profile updated successfully!');
+    }
 }
 
 // Run app
