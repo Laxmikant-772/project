@@ -56,13 +56,15 @@ function getInitials(name) {
 // Initialize app
 function init() {
     // Check dark mode preference
-    if (localStorage.getItem('darkMode') === 'true') {
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    if (isDark) {
         document.body.classList.add('dark-mode');
-        const darkModeIcon = document.querySelector('#darkModeBtn i');
-        if (darkModeIcon) {
-            darkModeIcon.classList.remove('fa-moon');
-            darkModeIcon.classList.add('fa-sun');
-        }
+    }
+    
+    // Set initial toggle state if available
+    const settingsDarkMode = document.getElementById('settingsDarkMode');
+    if (settingsDarkMode) {
+        settingsDarkMode.checked = isDark;
     }
 
     // Load profile data
@@ -261,21 +263,16 @@ function setupEventListeners() {
     }
     
     // Dark Mode Toggle
-    const darkModeBtn = document.getElementById('darkModeBtn');
-    if (darkModeBtn) {
-        darkModeBtn.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDark);
-            
-            const icon = darkModeBtn.querySelector('i');
+    const settingsDarkMode = document.getElementById('settingsDarkMode');
+    if (settingsDarkMode) {
+        settingsDarkMode.addEventListener('change', (e) => {
+            const isDark = e.target.checked;
             if (isDark) {
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
+                document.body.classList.add('dark-mode');
             } else {
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
+                document.body.classList.remove('dark-mode');
             }
+            localStorage.setItem('darkMode', isDark);
         });
     }
 }

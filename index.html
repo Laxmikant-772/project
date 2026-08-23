@@ -98,9 +98,6 @@
                 </div>
 
                 <div class="header-right">
-                    <button class="icon-btn" id="darkModeBtn" title="Toggle Dark Mode">
-                        <i class="fa-solid fa-moon"></i>
-                    </button>
                     <div class="dropdown-wrapper">
                         <button class="icon-btn notification-btn" id="notificationBtn">
                             <i class="fa-regular fa-bell"></i>
@@ -298,26 +295,224 @@
                         </div>
                     </div>
 
+                    <!-- Settings Section -->
                     <div id="settingsSection" class="page-section">
                         <div class="page-header" style="margin-bottom: 2rem;">
                             <div class="header-title">
+                                <span class="breadcrumb">Settings / System</span>
                                 <h1>Settings</h1>
-                                <p>System configuration and preferences.</p>
+                                <p>Manage security, appearance, notifications and system preferences.</p>
                             </div>
                         </div>
-                        <div class="records-card" style="padding: 2rem;">
-                            <form style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 500px;">
-                                <div class="form-group">
-                                    <label>System Password</label>
-                                    <input type="password" placeholder="Enter password" required pattern="(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}" title="Password must be at least 8 characters long, contain a lowercase letter, a number, and a special character (e.g., @)" style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; color: var(--text-main);">
-                                </div>
-                                <div>
-                                    <button type="button" class="btn primary-btn" onclick="showToast('Settings saved successfully!')">Save Settings</button>
-                                </div>
-                            </form>
-                        </div>
+
+    <div class="settings-grid">
+
+        <!-- Security -->
+        <div class="settings-card">
+            <div class="settings-card-header">
+                <div class="settings-icon security-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h2>Security</h2>
+                    <p>Manage your system security settings.</p>
+                </div>
+            </div>
+
+            <div class="settings-body">
+                <div class="form-group">
+                    <label for="systemPassword">
+                        System Password
+                    </label>
+                    <input
+                        type="password"
+                        id="systemPassword"
+                        placeholder="Enter new password"
+                        minlength="8"
+                    >
+                    <small>
+                        Minimum 8 characters with a number and special character.
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmSystemPassword">
+                        Confirm Password
+                    </label>
+                    <input
+                        type="password"
+                        id="confirmSystemPassword"
+                        placeholder="Confirm password"
+                    >
+                </div>
+
+                <div class="setting-row">
+                    <div>
+                        <strong>Auto Logout</strong>
+                        <p>Automatically log out after inactivity.</p>
                     </div>
 
+                    <label class="switch">
+                        <input type="checkbox" id="autoLogoutToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Appearance -->
+        <div class="settings-card">
+            <div class="settings-card-header">
+                <div class="settings-icon appearance-icon">
+                    <i class="fa-solid fa-palette"></i>
+                </div>
+                <div>
+                    <h2>Appearance</h2>
+                    <p>Customize the look of EduManage.</p>
+                </div>
+            </div>
+
+            <div class="settings-body">
+
+                <div class="setting-row">
+                    <div>
+                        <strong>Dark Mode</strong>
+                        <p>Use dark theme across the application.</p>
+                    </div>
+
+                    <label class="switch">
+                        <input type="checkbox" id="settingsDarkMode">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- Notifications -->
+        <div class="settings-card">
+            <div class="settings-card-header">
+                <div class="settings-icon notification-icon">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+                <div>
+                    <h2>Notifications</h2>
+                    <p>Choose which notifications you receive.</p>
+                </div>
+            </div>
+
+            <div class="settings-body">
+
+                <div class="setting-row">
+                    <div>
+                        <strong>Student Updates</strong>
+                        <p>Receive notifications about student changes.</p>
+                    </div>
+
+                    <label class="switch">
+                        <input
+                            type="checkbox"
+                            id="studentNotifications"
+                            checked
+                        >
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <div>
+                        <strong>Enrollment Alerts</strong>
+                        <p>Receive alerts for new enrollments.</p>
+                    </div>
+
+                    <label class="switch">
+                        <input
+                            type="checkbox"
+                            id="enrollmentNotifications"
+                            checked
+                        >
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- System Data -->
+        <div class="settings-card">
+            <div class="settings-card-header">
+                <div class="settings-icon system-icon">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+                <div>
+                    <h2>System Data</h2>
+                    <p>Manage your student data.</p>
+                </div>
+            </div>
+
+            <div class="settings-body">
+
+                <div class="data-action">
+                    <div>
+                        <strong>Export Student Data</strong>
+                        <p>Download all student records as a JSON file.</p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn secondary-btn"
+                        id="exportDataBtn"
+                    >
+                        <i class="fa-solid fa-download"></i>
+                        Export
+                    </button>
+                </div>
+
+                <div class="data-action danger-action">
+                    <div>
+                        <strong>Clear All Student Data</strong>
+                        <p>This will permanently remove all student records.</p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn danger-btn"
+                        id="clearDataBtn"
+                    >
+                        <i class="fa-solid fa-trash"></i>
+                        Clear Data
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Save Button -->
+    <div class="settings-footer">
+        <button
+            type="button"
+            class="btn primary-btn"
+            id="saveSettingsBtn"
+        >
+            <i class="fa-solid fa-floppy-disk"></i>
+            Save Settings
+        </button>
+
+        <button
+            type="button"
+            class="btn secondary-btn"
+            id="resetSettingsBtn"
+        >
+            Reset
+        </button>
+    </div>
+
+</div>
                     <div id="profileSection" class="page-section">
                         <div class="page-header" style="margin-bottom: 2rem;">
                             <div class="header-title">
