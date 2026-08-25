@@ -468,8 +468,8 @@ a {
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     overflow: hidden;
     width: 100%;
-    max-width: 1000px;
-    min-height: 500px;
+    max-width: 1200px;
+    min-height: 600px;
 }
 
 .login-banner {
@@ -516,7 +516,7 @@ a {
 .login-card {
     padding: 4rem;
     width: 100%;
-    max-width: 450px;
+    max-width: 550px;
     display: flex;
     flex-direction: column;
     justify-content: center;
