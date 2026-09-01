@@ -176,8 +176,8 @@ function setupEventListeners() {
                 targetSection.classList.add('active');
             }
 
-            // Show shared table container if dashboard or students is active
-            if (targetId === 'dashboardSection' || targetId === 'studentsSection') {
+            // Show shared table container if students is active
+            if (targetId === 'studentsSection') {
                 if (sharedTableContainer) {
                     sharedTableContainer.classList.add('active');
                 }
