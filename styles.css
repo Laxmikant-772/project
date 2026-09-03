@@ -48,6 +48,7 @@ body.dark-mode {
     --success-bg: rgba(16, 185, 129, 0.2);
     --warning-bg: rgba(245, 158, 11, 0.2);
     --info-bg: rgba(59, 130, 246, 0.2);
+    color-scheme: dark;
 }
 
 * {
@@ -62,6 +63,22 @@ body, html {
     min-height: 100%;
     background-color: var(--bg-color);
     color: var(--text-main);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
 }
 
 a {
