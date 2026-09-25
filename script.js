@@ -248,16 +248,40 @@ document.getElementById('printStudentsBtn').addEventListener('click', () => wind
 
 function initTheme() {
     const toggle = document.getElementById('settingsDarkMode');
-    if (state.settings.darkMode) {
-        document.body.classList.add('dark-mode');
-        if (toggle) toggle.checked = true;
+    const headerBtn = document.getElementById('headerDarkModeBtn');
+    const headerIcon = document.getElementById('headerDarkModeIcon');
+
+    function applyTheme(isDark) {
+        document.body.classList.toggle('dark-mode', isDark);
+        if (toggle) toggle.checked = isDark;
+        if (headerIcon) {
+            headerIcon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        }
+        if (typeof updateChartColors === 'function') {
+            try { updateChartColors(); } catch (e) {}
+        }
     }
+
+    if (state.settings.darkMode) {
+        applyTheme(true);
+    } else {
+        applyTheme(false);
+    }
+
     if (toggle) {
         toggle.addEventListener('change', (e) => {
             state.settings.darkMode = e.target.checked;
-            document.body.classList.toggle('dark-mode', state.settings.darkMode);
             saveData('settings');
-            updateChartColors();
+            applyTheme(state.settings.darkMode);
+        });
+    }
+
+    if (headerBtn) {
+        headerBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            state.settings.darkMode = !state.settings.darkMode;
+            saveData('settings');
+            applyTheme(state.settings.darkMode);
         });
     }
 }
