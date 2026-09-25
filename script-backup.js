@@ -1,8 +1,6 @@
 // ==========================================
 // STATE MANAGEMENT & LOCAL STORAGE
 // ==========================================
-const API_URL = "http://localhost:5000/api";
-
 let state = {
     students: [],
     courses: [],
@@ -10,7 +8,7 @@ let state = {
     attendance: [],
     fees: [],
     activities: [],
-    profile: { name: 'Administrator', email: 'admin@edumanage.com', phone: '91+ 1234567891' },
+    profile: { name: 'Administrator', email: 'admin@edumanage.com', phone: '+1 234 567 8900' },
     settings: { darkMode: false }
 };
 
@@ -20,9 +18,8 @@ const defaultCourses = [
 ];
 
 function loadData() {
-
-    // Students will now come from backend
-    state.students = [];
+    const s = localStorage.getItem('students');
+    state.students = s ? JSON.parse(s) : [];
 
     const c = localStorage.getItem('courses');
     state.courses = c ? JSON.parse(c) : defaultCourses;
@@ -45,38 +42,7 @@ function loadData() {
     const set = localStorage.getItem('settings');
     if (set) state.settings = JSON.parse(set);
 }
-async function loadStudentsFromBackend() {
-    try {
-        const response = await fetch(`${API_URL}/students`);
 
-        if (!response.ok) {
-            throw new Error("Failed to load students");
-        }
-
-        const data = await response.json();
-
-        state.students = data.map(student => ({
-            id: student.id,
-            studentId: student.student_id,
-            name: student.full_name,
-            email: student.email,
-            phone: student.phone,
-            gender: student.gender,
-            course: student.course,
-            semester: student.semester,
-            address: student.address,
-            date: student.joining_date,
-            dateOfBirth: student.date_of_birth,
-            status: student.status
-        }));
-
-        console.log("Students loaded from backend:", state.students);
-
-    } catch (error) {
-        console.error("Error loading students:", error);
-        showToast("Could not load students", "error");
-    }
-}
 function saveData(key) {
     if (key) {
         localStorage.setItem(key, JSON.stringify(state[key]));
@@ -167,11 +133,9 @@ function confirmAction(title, message, btnText, callback) {
 
 // ==========================================
 // DOM ELEMENTS & EVENT LISTENERS
-document.addEventListener('DOMContentLoaded', async () => {
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
     loadData();
-
-    loadStudentsFromBackend();
-
     initTheme();
     initPlugins();
     setupNavigation();
@@ -179,72 +143,72 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupModals();
     setupForms();
     renderAll();
-});
-// Auth logic
-const loginForm = document.getElementById('loginForm');
-if (loginForm) {
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('loginBtn');
-        btn.querySelector('.btn-text').style.display = 'none';
-        btn.querySelector('.btn-spinner').style.display = 'inline-block';
-        setTimeout(() => {
-            document.getElementById('loginScreen').classList.add('hidden-app');
-            document.getElementById('appLayout').classList.remove('hidden-app');
-            initCharts(); // init charts once visible
-            showToast('Logged in successfully', 'success');
-        }, 800);
+
+    // Auth logic
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            btn.querySelector('.btn-text').style.display = 'none';
+            btn.querySelector('.btn-spinner').style.display = 'inline-block';
+            setTimeout(() => {
+                document.getElementById('loginScreen').classList.add('hidden-app');
+                document.getElementById('appLayout').classList.remove('hidden-app');
+                initCharts(); // init charts once visible
+                showToast('Logged in successfully', 'success');
+            }, 800);
+        });
+    }
+
+    const togglePw = document.getElementById('togglePasswordBtn');
+    if (togglePw) {
+        togglePw.addEventListener('click', () => {
+            const pwInput = document.getElementById('loginPassword');
+            if (pwInput.type === 'password') {
+                pwInput.type = 'text';
+                togglePw.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
+            } else {
+                pwInput.type = 'password';
+                togglePw.innerHTML = '<i class="fa-solid fa-eye"></i>';
+            }
+        });
+    }
+
+    document.getElementById('dropdownLogoutBtn').addEventListener('click', () => {
+        document.getElementById('appLayout').classList.add('hidden-app');
+        document.getElementById('loginScreen').classList.remove('hidden-app');
+        showToast('Logged out successfully', 'info');
     });
-}
 
-const togglePw = document.getElementById('togglePasswordBtn');
-if (togglePw) {
-    togglePw.addEventListener('click', () => {
-        const pwInput = document.getElementById('loginPassword');
-        if (pwInput.type === 'password') {
-            pwInput.type = 'text';
-            togglePw.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
-        } else {
-            pwInput.type = 'password';
-            togglePw.innerHTML = '<i class="fa-solid fa-eye"></i>';
-        }
+    // Profile sync
+    updateProfileUI();
+
+    // Confirm dialog actions
+    document.getElementById('confirmCancelBtn').addEventListener('click', () => {
+        document.getElementById('confirmDialog').classList.remove('show');
+        confirmActionCallback = null;
     });
-}
-
-document.getElementById('dropdownLogoutBtn').addEventListener('click', () => {
-    document.getElementById('appLayout').classList.add('hidden-app');
-    document.getElementById('loginScreen').classList.remove('hidden-app');
-    showToast('Logged out successfully', 'info');
-});
-
-// Profile sync
-updateProfileUI();
-
-// Confirm dialog actions
-document.getElementById('confirmCancelBtn').addEventListener('click', () => {
-    document.getElementById('confirmDialog').classList.remove('show');
-    confirmActionCallback = null;
-});
-document.getElementById('confirmActionBtn').addEventListener('click', () => {
-    if (confirmActionCallback) confirmActionCallback();
-    document.getElementById('confirmDialog').classList.remove('show');
-});
-
-// Clear data
-document.getElementById('clearDataBtn').addEventListener('click', () => {
-    confirmAction('Clear All Data', 'This action will permanently delete all students, courses, fees, and records. Are you absolutely sure?', 'Yes, Clear All', () => {
-        localStorage.clear();
-        loadData();
-        renderAll();
-        showToast('All data cleared successfully', 'success');
+    document.getElementById('confirmActionBtn').addEventListener('click', () => {
+        if (confirmActionCallback) confirmActionCallback();
+        document.getElementById('confirmDialog').classList.remove('show');
     });
-});
 
-// Export Students
-document.getElementById('exportStudentsBtn').addEventListener('click', exportStudentsCSV);
-// Print Students
-document.getElementById('printStudentsBtn').addEventListener('click', () => window.print());
-;
+    // Clear data
+    document.getElementById('clearDataBtn').addEventListener('click', () => {
+        confirmAction('Clear All Data', 'This action will permanently delete all students, courses, fees, and records. Are you absolutely sure?', 'Yes, Clear All', () => {
+            localStorage.clear();
+            loadData();
+            renderAll();
+            showToast('All data cleared successfully', 'success');
+        });
+    });
+
+    // Export Students
+    document.getElementById('exportStudentsBtn').addEventListener('click', exportStudentsCSV);
+    // Print Students
+    document.getElementById('printStudentsBtn').addEventListener('click', () => window.print());
+});
 
 function initTheme() {
     const toggle = document.getElementById('settingsDarkMode');
