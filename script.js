@@ -45,7 +45,11 @@ function loadData() {
     const set = localStorage.getItem('settings');
     if (set) state.settings = JSON.parse(set);
 }
+let studentsLoading = true;
+
 async function loadStudentsFromBackend() {
+    studentsLoading = true;
+    renderStudentsTable();
     try {
         const response = await fetch(`${API_URL}/students`);
 
@@ -64,14 +68,23 @@ async function loadStudentsFromBackend() {
             gender: student.gender,
             course: student.course,
             semester: student.semester,
+            address: student.address,
             date: student.joining_date,
             dateOfBirth: student.date_of_birth,
             status: student.status
         }));
 
-        console.log("Students loaded from backend:", state.students);
+        console.log("Students API response:", data);
+        console.log("state.students:", state.students);
+        console.log("Student count:", state.students.length);
+
+        studentsLoading = false;
+        renderStudentsTable();
+        updateDashboardStats();
 
     } catch (error) {
+        studentsLoading = false;
+        renderStudentsTable();
         console.error("Error loading students:", error);
         showToast("Could not load students", "error");
     }
@@ -80,7 +93,6 @@ function saveData(key) {
     if (key) {
         localStorage.setItem(key, JSON.stringify(state[key]));
     } else {
-        localStorage.setItem('students', JSON.stringify(state.students));
         localStorage.setItem('courses', JSON.stringify(state.courses));
         localStorage.setItem('enrollments', JSON.stringify(state.enrollments));
         localStorage.setItem('attendance', JSON.stringify(state.attendance));
@@ -528,6 +540,7 @@ function renderDashboardStudents() {
 }
 
 function renderStudentsTable(page = 1) {
+    console.log("Rendering students:", state.students.length);
     currentPage = typeof page === 'number' ? page : 1;
 
     const search = document.getElementById('searchInput').value.toLowerCase();
@@ -568,9 +581,29 @@ function renderStudentsTable(page = 1) {
     const tbody = document.getElementById('studentsTableBody');
     tbody.innerHTML = '';
 
+    if (studentsLoading) {
+        document.querySelector('.table-container').style.display = 'none';
+        document.getElementById('studentsEmptyState').classList.add('hidden');
+        document.getElementById('studentsLoadingState')?.classList.remove('hidden');
+        document.getElementById('paginationContainer').style.display = 'none';
+        return;
+    } else {
+        document.getElementById('studentsLoadingState')?.classList.add('hidden');
+    }
+
     if (filtered.length === 0) {
         document.querySelector('.table-container').style.display = 'none';
-        document.getElementById('studentsEmptyState').classList.remove('hidden');
+        const emptyState = document.getElementById('studentsEmptyState');
+        if (state.students.length === 0) {
+            emptyState.querySelector('h3').textContent = 'No students found';
+            emptyState.querySelector('p').textContent = 'No records exist in the database.';
+            document.getElementById('emptyClearFiltersBtn').classList.add('hidden');
+        } else {
+            emptyState.querySelector('h3').textContent = 'No students found';
+            emptyState.querySelector('p').textContent = 'There are no records matching your current search or filter criteria.';
+            document.getElementById('emptyClearFiltersBtn').classList.remove('hidden');
+        }
+        emptyState.classList.remove('hidden');
         document.getElementById('paginationContainer').style.display = 'none';
         return;
     }
@@ -670,9 +703,26 @@ async function handleStudentSubmit(e) {
         dateOfBirth: document.getElementById('dateOfBirth').value,
         course: document.getElementById('course').value,
         semester: document.getElementById('semester').value,
+        address: document.getElementById('address').value.trim(),
         date: document.getElementById('date').value,
         status: document.getElementById('status').value
     };
+
+    if (!studentData.address) {
+        showToast("Address is required", "error");
+        if (btn) btn.disabled = false;
+        return;
+    }
+    if (studentData.address.length < 5) {
+        showToast("Address must be at least 5 characters", "error");
+        if (btn) btn.disabled = false;
+        return;
+    }
+    if (studentData.address.length > 255) {
+        showToast("Address cannot exceed 255 characters", "error");
+        if (btn) btn.disabled = false;
+        return;
+    }
     
     // Frontend validation for student ID uniqueness on add
     if (!editId) {
@@ -691,6 +741,7 @@ async function handleStudentSubmit(e) {
         gender: studentData.gender,
         course: studentData.course,
         semester: studentData.semester,
+        address: studentData.address,
         joining_date: studentData.date,
         date_of_birth: studentData.dateOfBirth,
         status: studentData.status
@@ -755,6 +806,7 @@ window.editStudent = function (studentId) {
 
     document.getElementById('course').value = student.course;
     document.getElementById('semester').value = student.semester || '1';
+    document.getElementById('address').value = student.address || '';
 
     const dateInp = document.getElementById('date');
     dateInp.value = student.date;
@@ -807,6 +859,7 @@ window.viewStudent = function (studentId) {
     document.getElementById('viewGender').textContent = s.gender || '-';
     document.getElementById('viewDob').textContent = formatDate(s.dateOfBirth);
     document.getElementById('viewJoined').textContent = formatDate(s.date);
+    document.getElementById('viewAddress').textContent = s.address || '-';
 
     document.getElementById('viewAttendance').textContent = s.attendance ? `${s.attendance}%` : 'N/A';
     document.getElementById('viewFeeStatus').textContent = s.feeStatus || 'N/A';

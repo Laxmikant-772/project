@@ -370,6 +370,11 @@
                                 </table>
                             </div>
 
+                            <div id="studentsLoadingState" class="empty-state hidden">
+                                <div class="empty-icon"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
+                                <h3>Loading students...</h3>
+                            </div>
+
                             <div id="studentsEmptyState" class="empty-state hidden">
                                 <div class="empty-icon"><i class="fa-solid fa-user-slash"></i></div>
                                 <h3>No students found</h3>
@@ -855,6 +860,14 @@
                     </div>
                 </div>
 
+                <div class="form-group address-field">
+                    <label for="address">Address</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-map-location-dot" style="top: 1.25rem;"></i>
+                        <textarea id="address" name="address" placeholder=" city, state" rows="3" required></textarea>
+                    </div>
+                </div>
+
                 <div class="form-actions full-width">
                     <button type="button" data-close="studentModal" class="btn secondary-btn">Cancel</button>
                     <button type="submit" class="btn primary-btn" id="saveStudentBtn">Save Student</button>
@@ -932,6 +945,10 @@
                 <div class="detail-item">
                     <label>Joining Date</label>
                     <p id="viewJoined">15-08-2023</p>
+                </div>
+                <div class="detail-item address-field">
+                    <label>ADDRESS</label>
+                    <p id="viewAddress">Mysuru, Karnataka</p>
                 </div>
             </div>
         </div>
