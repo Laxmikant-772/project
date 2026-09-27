@@ -64,7 +64,6 @@ async function loadStudentsFromBackend() {
             gender: student.gender,
             course: student.course,
             semester: student.semester,
-            address: student.address,
             date: student.joining_date,
             dateOfBirth: student.date_of_birth,
             status: student.status
@@ -287,7 +286,15 @@ function initTheme() {
 }
 
 function initPlugins() {
-    flatpickr("#dob", { dateFormat: "Y-m-d", maxDate: "today" });
+    flatpickr("#dateOfBirth", {
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d-m-Y",
+        maxDate: "today",
+        allowInput: true,
+        monthSelectorType: "dropdown",
+        yearSelectorType: "dropdown"
+    });
     flatpickr("#date", { dateFormat: "Y-m-d", maxDate: "today", defaultDate: "today" });
 }
 
@@ -645,9 +652,13 @@ function renderPaginationControls(totalPages) {
 // ==========================================
 // STUDENT CRUD
 // ==========================================
-function handleStudentSubmit(e) {
+async function handleStudentSubmit(e) {
     e.preventDefault();
-    const editId = document.getElementById('editStudentId').value;
+    const editId = document.getElementById('editStudentId').value; // This will hold the db id
+    const btn = document.getElementById('saveStudentBtn');
+    
+    // Disable btn to prevent double submit
+    if (btn) btn.disabled = true;
 
     const studentData = {
         studentId: document.getElementById('studentId').value,
@@ -655,37 +666,68 @@ function handleStudentSubmit(e) {
         email: document.getElementById('email').value,
         phone: document.getElementById('phone').value,
         gender: document.getElementById('gender').value,
-        dob: document.getElementById('dob').value,
+        dateOfBirth: document.getElementById('dateOfBirth').value,
         course: document.getElementById('course').value,
         semester: document.getElementById('semester').value,
         date: document.getElementById('date').value,
-        status: document.getElementById('status').value,
-        address: document.getElementById('address').value
+        status: document.getElementById('status').value
     };
-
-    if (editId) {
-        const idx = state.students.findIndex(s => s.studentId === editId);
-        if (idx !== -1) {
-            // Check ID uniqueness if changed
-            if (studentData.studentId !== editId && state.students.some(s => s.studentId === studentData.studentId)) {
-                showToast('Student ID already exists!', 'error'); return;
-            }
-            state.students[idx] = studentData;
-            showToast('Student updated successfully');
-            logActivity(`Updated record for ${studentData.name}`, 'fa-solid fa-user-pen');
-        }
-    } else {
+    
+    // Frontend validation for student ID uniqueness on add
+    if (!editId) {
         if (state.students.some(s => s.studentId === studentData.studentId)) {
-            showToast('Student ID already exists!', 'error'); return;
+            showToast('Student ID already exists!', 'error');
+            if (btn) btn.disabled = false;
+            return;
         }
-        state.students.push(studentData);
-        showToast('Student added successfully');
-        logActivity(`Added new student ${studentData.name}`, 'fa-solid fa-user-plus');
     }
 
-    saveData('students');
-    document.getElementById('studentModal').classList.remove('show');
-    renderAll();
+    const payload = {
+        student_id: studentData.studentId,
+        full_name: studentData.name,
+        email: studentData.email,
+        phone: studentData.phone,
+        gender: studentData.gender,
+        course: studentData.course,
+        semester: studentData.semester,
+        joining_date: studentData.date,
+        date_of_birth: studentData.dateOfBirth,
+        status: studentData.status
+    };
+
+    try {
+        if (editId) {
+            // PUT request
+            const response = await fetch(`${API_URL}/students/${editId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) throw new Error("Failed to update student");
+            showToast('Student updated successfully');
+            logActivity(`Updated record for ${studentData.name}`, 'fa-solid fa-user-pen');
+        } else {
+            // POST request
+            const response = await fetch(`${API_URL}/students`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) throw new Error("Failed to add student");
+            const createdStudent = await response.json();
+            showToast('Student added successfully!');
+            logActivity(`Added new student ${studentData.name}`, 'fa-solid fa-user-plus');
+        }
+
+        document.getElementById('studentModal').classList.remove('show');
+        await loadStudentsFromBackend();
+        renderAll();
+    } catch (error) {
+        console.error(error);
+        showToast(error.message || 'An error occurred', 'error');
+    } finally {
+        if (btn) btn.disabled = false;
+    }
 }
 
 window.editStudent = function (studentId) {
@@ -699,16 +741,16 @@ window.editStudent = function (studentId) {
         courseSelect.innerHTML += `<option value="${c.name}">${c.name}</option>`;
     });
 
-    document.getElementById('editStudentId').value = student.studentId;
+    document.getElementById('editStudentId').value = student.id; // DB ID
     document.getElementById('studentId').value = student.studentId;
     document.getElementById('name').value = student.name;
     document.getElementById('email').value = student.email;
     document.getElementById('phone').value = student.phone || '';
     document.getElementById('gender').value = student.gender || '';
 
-    const dobInp = document.getElementById('dob');
-    dobInp.value = student.dob || '';
-    if (dobInp._flatpickr) dobInp._flatpickr.setDate(student.dob || '');
+    const dobInp = document.getElementById('dateOfBirth');
+    dobInp.value = student.dateOfBirth || '';
+    if (dobInp._flatpickr) dobInp._flatpickr.setDate(student.dateOfBirth || '');
 
     document.getElementById('course').value = student.course;
     document.getElementById('semester').value = student.semester || '1';
@@ -718,7 +760,6 @@ window.editStudent = function (studentId) {
     if (dateInp._flatpickr) dateInp._flatpickr.setDate(student.date);
 
     document.getElementById('status').value = student.status;
-    document.getElementById('address').value = student.address || '';
 
     document.getElementById('modalTitle').textContent = 'Edit Student Details';
     document.getElementById('studentModal').classList.add('show');
@@ -728,12 +769,21 @@ window.deleteStudent = function (studentId) {
     const student = state.students.find(s => s.studentId === studentId);
     if (!student) return;
 
-    confirmAction('Delete Student?', `Are you sure you want to delete ${student.name}'s record? This cannot be undone.`, 'Yes, Delete', () => {
-        state.students = state.students.filter(s => s.studentId !== studentId);
-        saveData('students');
-        showToast('Student deleted successfully');
-        logActivity(`Deleted student ${student.name}`, 'fa-solid fa-user-minus text-danger');
-        renderAll();
+    confirmAction('Delete Student?', `Are you sure you want to delete ${student.name}'s record? This cannot be undone.`, 'Yes, Delete', async () => {
+        try {
+            const response = await fetch(`${API_URL}/students/${student.id}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) throw new Error("Failed to delete student");
+            
+            showToast('Student deleted successfully');
+            logActivity(`Deleted student ${student.name}`, 'fa-solid fa-user-minus text-danger');
+            await loadStudentsFromBackend();
+            renderAll();
+        } catch(e) {
+            console.error(e);
+            showToast(e.message || 'Failed to delete student', 'error');
+        }
     });
 }
 
@@ -754,9 +804,8 @@ window.viewStudent = function (studentId) {
     document.getElementById('viewCourse').textContent = s.course;
     document.getElementById('viewSemester').textContent = s.semester ? `Semester ${s.semester}` : '-';
     document.getElementById('viewGender').textContent = s.gender || '-';
-    document.getElementById('viewDob').textContent = formatDate(s.dob);
+    document.getElementById('viewDob').textContent = formatDate(s.dateOfBirth);
     document.getElementById('viewJoined').textContent = formatDate(s.date);
-    document.getElementById('viewAddress').textContent = s.address || '-';
 
     document.getElementById('viewStudentModal').classList.add('show');
 }
