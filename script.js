@@ -169,7 +169,7 @@ function confirmAction(title, message, btnText, callback) {
 document.addEventListener('DOMContentLoaded', async () => {
     loadData();
 
-    loadStudentsFromBackend();
+    await loadStudentsFromBackend();
 
     initTheme();
     initPlugins();
@@ -539,6 +539,7 @@ function renderStudentsTable(page = 1) {
         const matchSearch = s.name.toLowerCase().includes(search) ||
             s.studentId.toLowerCase().includes(search) ||
             s.email.toLowerCase().includes(search) ||
+            (s.course && s.course.toLowerCase().includes(search)) ||
             (s.phone && s.phone.includes(search));
         const matchCourse = fCourse ? s.course === fCourse : true;
         const matchSem = fSem ? s.semester === fSem : true;
@@ -806,6 +807,10 @@ window.viewStudent = function (studentId) {
     document.getElementById('viewGender').textContent = s.gender || '-';
     document.getElementById('viewDob').textContent = formatDate(s.dateOfBirth);
     document.getElementById('viewJoined').textContent = formatDate(s.date);
+
+    document.getElementById('viewAttendance').textContent = s.attendance ? `${s.attendance}%` : 'N/A';
+    document.getElementById('viewFeeStatus').textContent = s.feeStatus || 'N/A';
+    document.getElementById('viewCgpa').textContent = s.cgpa || 'N/A';
 
     document.getElementById('viewStudentModal').classList.add('show');
 }
